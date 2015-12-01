@@ -25,4 +25,10 @@ public class Move {
         return captured;
     }
 
+    public String getSAN() {
+        String SAN;
+        String letter = Character.toString((char) ((int)'a' + to.x));
+        String number = Character.toString((char) ((int)'0' + to.y));
+        return (letter + number);
+    }
 }
