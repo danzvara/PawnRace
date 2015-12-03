@@ -137,7 +137,7 @@ public class Game {
         if (player == WHITE) {
             if (gameBoard.getSquare(toX, toY).occupiedBy() == BLACK) {
                 isCapture = true;
-            } else if(gameBoard.getSquare(toX, toY).occupiedBy() == WHITE) {
+            } else if (gameBoard.getSquare(toX, toY).occupiedBy() == WHITE) {
                 return NULL;
             } else {
                 isCapture = false;
@@ -147,7 +147,7 @@ public class Game {
         if (player == BLACK) {
             if (gameBoard.getSquare(toX, toY).occupiedBy() == WHITE) {
                 isCapture = true;
-            } else if(gameBoard.getSquare(toX, toY).occupiedBy() == BLACK) {
+            } else if (gameBoard.getSquare(toX, toY).occupiedBy() == BLACK) {
                 return NULL;
             } else {
                 isCapture = false;
