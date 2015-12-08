@@ -56,8 +56,10 @@ public class Game {
         int blacks = 0;
         Color player;
 
-        if (lastMove.getTo().getY() == 7 || lastMove.getTo().getY() == 0) {
-            return true;
+        if(lastMove != null) {
+            if (lastMove.getTo().getY() == 7 || lastMove.getTo().getY() == 0) {
+                return true;
+            }
         }
 
         for (int i = 0; i < 8; i++) {
@@ -78,15 +80,11 @@ public class Game {
         blacks = 0;
         for (int j = 1; j < 7; j++) {
             for (int i = 0; i < 8; i++) {
-                player = this.gameBoard.getSquare(i, j).occupiedBy();
-                if (player == Color.NONE) {
-                    continue;
-                }
-
+                player = gameBoard.getSquare(i, j).occupiedBy();
                 if (player == Color.BLACK) {
                     blacks += isBlocked(j, i, Color.BLACK);
-                } else {
-                    blacks += isBlocked(j, i, Color.WHITE);
+                } else if (player == Color.WHITE){
+                    whites += isBlocked(j, i, Color.WHITE);
                 }
             }
         }
@@ -126,9 +124,9 @@ public class Game {
 
     public Move parseMove(String san) {
         int fromX = (int) san.charAt(0) - (int) 'a';
-        int fromY = (int) san.charAt(1) - (int) '0';
-        int toX = (int) san.charAt(2) - (int) 'a';
-        int toY = (int) san.charAt(3) - (int) '0';
+        int fromY = (int) san.charAt(1) - (int) '1';
+        int toX = (int) san.charAt(3) - (int) 'a';
+        int toY = (int) san.charAt(4) - (int) '1';
         Square sqF, sqT;
         Move move;
         Color player = gameBoard.getSquare(fromX, fromY).occupiedBy();
@@ -141,9 +139,7 @@ public class Game {
             } else {
                 isCapture = false;
             }
-        }
-
-        if (player == Color.BLACK) {
+        } else if (player == Color.BLACK) {
             if (gameBoard.getSquare(toX, toY).occupiedBy() == Color.WHITE) {
                 isCapture = true;
             } else if (gameBoard.getSquare(toX, toY).occupiedBy() == Color.BLACK) {

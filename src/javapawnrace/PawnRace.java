@@ -1,7 +1,6 @@
 package javapawnrace;
 
 public class PawnRace {
-    private static Color currenPlayer;
     private static char whiteGap;
     private static char blackGap;
     private static boolean player1Computer;
@@ -12,6 +11,8 @@ public class PawnRace {
     private static Player player2;
 
     public static void main(String[] args) {
+        Move nextMove;
+
         if (args[0].equals("P")) {
             player1Computer = false;
         } else if (args[0].equals("C")) {
@@ -30,7 +31,15 @@ public class PawnRace {
         game = new Game(board);
         player1 = new Player(game, board, Color.WHITE, player1Computer);
         player2 = new Player(game, board, Color.BLACK, player2Computer);
-
         board.display();
+
+        while(!game.isFinished()) {
+            System.out.print("(" + game.getPlayerColor() + "): Input move in algebraic notation: ");
+            nextMove = game.parseMove(IOUtil.readString());
+            game.applyMove(nextMove);
+            board.display();
+        }
+
+        System.out.print("The " + game.getGameResult() + " won!");
     }
 }

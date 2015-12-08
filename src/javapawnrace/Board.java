@@ -28,8 +28,8 @@ public class Board {
     public void applyMove(Move move) {
         Square from = move.getFrom();
         Square to = move.getTo();
+        board[to.getY()][to.getX()].setOccupier(to.occupiedBy());
         board[from.getY()][from.getX()].setOccupier(Color.NONE);
-        board[to.getY()][to.getX()].setOccupier(from.occupiedBy());
     }
 
     public void unApplyMove(Move move) {
