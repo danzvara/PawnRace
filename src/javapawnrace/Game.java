@@ -1,16 +1,15 @@
-/**
- * Created by daniel on 01/12/15.
- */
+package javapawnrace;
+
 public class Game {
     private Move[] moves;
     private int move_index;
-    private COLOR currentPlayer;
+    private Color currentPlayer;
     private Board gameBoard;
 
     public Game(Board board) {
         moves = new Move[400];
         move_index = 0;
-        currentPlayer = WHITE;
+        currentPlayer = Color.WHITE;
         gameBoard = board;
     }
 
@@ -20,7 +19,7 @@ public class Game {
 
     public Move getLastMove() {
         if (move_index == 0) {
-            return NULL;
+            return null;
         }
 
         return moves[move_index - 1];
@@ -30,10 +29,10 @@ public class Game {
         moves[move_index] = move;
         move_index++;
         gameBoard.applyMove(move);
-        if (currentPlayer == BLACK) {
-            currentPlayer = WHITE;
+        if (currentPlayer == Color.BLACK) {
+            currentPlayer = Color.WHITE;
         } else {
-            currentPlayer = BLACK;
+            currentPlayer = Color.BLACK;
         }
     }
 
@@ -42,12 +41,12 @@ public class Game {
             return;
         }
         gameBoard.unApplyMove(move);
-        moves[move_index - 1] = NULL;
+        moves[move_index - 1] = null;
         move_index--;
-        if (currentPlayer == WHITE) {
-            currentPlayer = BLACK;
+        if (currentPlayer == Color.WHITE) {
+            currentPlayer = Color.BLACK;
         } else {
-            currentPlayer = WHITE;
+            currentPlayer = Color.WHITE;
         }
     }
 
@@ -55,23 +54,23 @@ public class Game {
         Move lastMove = getLastMove();
         int whites = 0;
         int blacks = 0;
-        COLOR player;
+        Color player;
 
-        if (lastMove.getTo().getY() == 7 || lastMove.getTo().getY == 0) {
+        if (lastMove.getTo().getY() == 7 || lastMove.getTo().getY() == 0) {
             return true;
         }
 
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                if (gameBoard.getSquare(i, j).occupiedBy() == WHITE) {
+                if (gameBoard.getSquare(i, j).occupiedBy() == Color.WHITE) {
                     whites++;
-                } else if (gameBoard.getSquare(i, j).occupiedBy() == BLACK)
+                } else if (gameBoard.getSquare(i, j).occupiedBy() == Color.BLACK) {
                     blacks++;
                 }
             }
         }
 
-        if (whites == 0 || blacks == 0) {
+        if ((whites == 0) || (blacks == 0)) {
             return true;
         }
 
@@ -79,15 +78,15 @@ public class Game {
         blacks = 0;
         for (int j = 1; j < 7; j++) {
             for (int i = 0; i < 8; i++) {
-                player = this.gameBoard.getSquare(i, j);
-                if (player == NONE) {
+                player = this.gameBoard.getSquare(i, j).occupiedBy();
+                if (player == Color.NONE) {
                     continue;
                 }
 
-                if (player == BLACK) {
-                    blacks += isBlocked(j, i, BLACK);
+                if (player == Color.BLACK) {
+                    blacks += isBlocked(j, i, Color.BLACK);
                 } else {
-                    blacks += isBlocked(j, i, WHITE);
+                    blacks += isBlocked(j, i, Color.WHITE);
                 }
             }
         }
@@ -100,28 +99,28 @@ public class Game {
     }
 
     //returns zero if the pawn is blocked, one if is free 
-    private int isBlocked(int y, int x, COLOR player) {
-        if (player == WHITE) {
-            if (gameBoard.getSquare(x, y+1).occupiedBy() == NONE) {
+    private int isBlocked(int y, int x, Color player) {
+        if (player == Color.WHITE) {
+            if (gameBoard.getSquare(x, y + 1).occupiedBy() == Color.NONE) {
                 return 1;
-            } 
+            }
             //TODO:Implement en passant move
             //else if (x < 7 && gameBoard.getSquare(x+1, y) == BLACK && gameBoard.getSquare(x+1, y+1) == NONE) {
             //    return 1;
             //} else if (x > 0 && gameBoard.getSquare(x-1, y) == BLACK && gameBoard.getSquare(x-1, y+1) == NONE) {
-        } else if (player == BLACK) {
-            if (gameBoard.getSquare(x, y-1).occupiedBy() == NONE) {
+        } else if (player == Color.BLACK) {
+            if (gameBoard.getSquare(x, y - 1).occupiedBy() == Color.NONE) {
                 return 1;
             }
         }
         return 0;
     }
 
-    public COLOR getGameResult() {
-        if (currentPlayer == WHITE) {
-            return BLACK;
+    public Color getGameResult() {
+        if (currentPlayer == Color.WHITE) {
+            return Color.BLACK;
         } else {
-            return WHITE;
+            return Color.WHITE;
         }
     }
 
@@ -132,43 +131,38 @@ public class Game {
         int toY = (int) san.charAt(3) - (int) '0';
         Square sqF, sqT;
         Move move;
-        COLOR player = gameBoard.getSquare(fromX, fromY).occupiedBy();
+        Color player = gameBoard.getSquare(fromX, fromY).occupiedBy();
         boolean isCapture;
-        if (player == WHITE) {
-            if (gameBoard.getSquare(toX, toY).occupiedBy() == BLACK) {
+        if (player == Color.WHITE) {
+            if (gameBoard.getSquare(toX, toY).occupiedBy() == Color.BLACK) {
                 isCapture = true;
-            } else if (gameBoard.getSquare(toX, toY).occupiedBy() == WHITE) {
-                return NULL;
+            } else if (gameBoard.getSquare(toX, toY).occupiedBy() == Color.WHITE) {
+                return null;
             } else {
                 isCapture = false;
             }
         }
 
-        if (player == BLACK) {
-            if (gameBoard.getSquare(toX, toY).occupiedBy() == WHITE) {
+        if (player == Color.BLACK) {
+            if (gameBoard.getSquare(toX, toY).occupiedBy() == Color.WHITE) {
                 isCapture = true;
-            } else if (gameBoard.getSquare(toX, toY).occupiedBy() == BLACK) {
-                return NULL;
+            } else if (gameBoard.getSquare(toX, toY).occupiedBy() == Color.BLACK) {
+                return null;
             } else {
                 isCapture = false;
             }
         } else {
-            return NULL;
+            return null;
         }
 
         sqF = new Square(fromX, fromY);
-        sqF.setOccupier(NONE);
+        sqF.setOccupier(Color.NONE);
         sqT = new Square(toX, toY);
         sqT.setOccupier(player);
         move = new Move(sqF, sqT, isCapture);
         return move;
     }
 }
-
-
-
-
-
 
 
 

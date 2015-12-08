@@ -1,6 +1,5 @@
-/**
- * Created by daniel on 01/12/15.
- */
+package javapawnrace;
+
 public class Move {
 
     private Square from;
@@ -27,8 +26,8 @@ public class Move {
 
     public String getSAN() {
         String SAN;
-        String letter = Character.toString((char) ((int)'a' + to.x));
-        String number = Character.toString((char) ((int)'0' + to.y));
+        String letter = Character.toString((char) ((int) 'a' + this.to.getX()));
+        String number = Character.toString((char) ((int) '0' + this.to.getY()));
         return (letter + number);
     }
 }
