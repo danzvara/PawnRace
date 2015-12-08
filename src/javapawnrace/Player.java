@@ -68,19 +68,29 @@ public class Player {
             pawn = pawns[i];
             if (pawn.getY() == baseY && board.getSquare(pawn.getX(), baseY + step_forward).occupiedBy() == Color.NONE) {
                 valid_moves[noMoves] = new Move(new Square(pawn.getX(), baseY), new Square(pawn.getX(), baseY + step_forward), false);
+                valid_moves[noMoves].getFrom().setOccupier(Color.NONE);
+                valid_moves[noMoves].getTo().setOccupier(board.getSquare(pawn.getX(), baseY).occupiedBy());
                 noMoves++;
                 if (board.getSquare(pawn.getX(), baseY + 2 * step_forward).occupiedBy() == Color.NONE) {
                     valid_moves[noMoves] = new Move(new Square(pawn.getX(), baseY), new Square(pawn.getX(), baseY + 2 * step_forward), false);
+                    valid_moves[noMoves].getFrom().setOccupier(Color.NONE);
+                    valid_moves[noMoves].getTo().setOccupier(board.getSquare(pawn.getX(), baseY).occupiedBy());
                     noMoves++;
                 }
             } else if (board.getSquare(pawn.getX(), pawn.getY() + step_forward).occupiedBy() == Color.NONE) {
                 valid_moves[noMoves] = new Move(new Square(pawn.getX(), pawn.getY()), new Square(pawn.getX(), pawn.getY() + step_forward), false);
+                valid_moves[noMoves].getFrom().setOccupier(Color.NONE);
+                valid_moves[noMoves].getTo().setOccupier(board.getSquare(pawn.getX(), pawn.getY()).occupiedBy());
                 noMoves++;
             } else if (board.getSquare(pawn.getX() + 1, pawn.getY() + step_forward).occupiedBy() == this.opponentColor) {
                 valid_moves[noMoves] = new Move(new Square(pawn.getX(), pawn.getY()), new Square(pawn.getX() + 1, pawn.getY() + step_forward), true);
+                valid_moves[noMoves].getFrom().setOccupier(Color.NONE);
+                valid_moves[noMoves].getTo().setOccupier(board.getSquare(pawn.getX(), pawn.getY()).occupiedBy());
                 noMoves++;
             } else if (board.getSquare(pawn.getX() - 1, pawn.getY() + step_forward).occupiedBy() == this.opponentColor) {
                 valid_moves[noMoves] = new Move(new Square(pawn.getX(), pawn.getY()), new Square(pawn.getX() - 1, pawn.getY() + step_forward), true);
+                valid_moves[noMoves].getFrom().setOccupier(Color.NONE);
+                valid_moves[noMoves].getTo().setOccupier(board.getSquare(pawn.getX(), pawn.getY()).occupiedBy());
                 noMoves++;
             }
             //TODO: en-passant

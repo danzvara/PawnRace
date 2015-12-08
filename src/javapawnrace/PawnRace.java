@@ -34,9 +34,16 @@ public class PawnRace {
         board.display();
 
         while(!game.isFinished()) {
-            System.out.print("(" + game.getPlayerColor() + "): Input move in algebraic notation: ");
-            nextMove = game.parseMove(IOUtil.readString());
-            game.applyMove(nextMove);
+            if (game.getPlayerColor() == player1.getColor() && player1Computer) {
+                player1.makeMove();
+            } else if (game.getPlayerColor() == player2.getColor() && player2Computer) {
+                player2.makeMove();
+            } else {
+                System.out.print("(" + game.getPlayerColor() + "): Input move in algebraic notation: ");
+                nextMove = game.parseMove(IOUtil.readString());
+                game.applyMove(nextMove);
+            }
+
             board.display();
         }
 
