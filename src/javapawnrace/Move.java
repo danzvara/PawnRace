@@ -6,10 +6,10 @@ public class Move {
     private Square to;
     private boolean captured;
 
-    public Move(Square inFrom, Square inTo, boolean inCaptured) {
-        from = inFrom;
-        to = inTo;
-        captured = inCaptured;
+    public Move(Square from, Square to, boolean captured) {
+        this.from = from;
+        this.to = to;
+        this.captured = captured;
     }
 
     public Square getFrom() {
@@ -25,9 +25,15 @@ public class Move {
     }
 
     public String getSAN() {
-        String SAN;
+        String originColumn = "";
+
+        if (isCaptured()) {
+            originColumn = Character.toString((char) ((int) 'a' + this.from.getX()));
+            originColumn += "x";
+        }
+
         String letter = Character.toString((char) ((int) 'a' + this.to.getX()));
-        String number = Character.toString((char) ((int) '0' + this.to.getY()));
-        return (letter + number);
+        String number = Character.toString((char) ((int) '1' + this.to.getY()));
+        return (originColumn + letter + number);
     }
 }

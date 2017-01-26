@@ -14,10 +14,15 @@ public class Player {
         this.board = board;
         this.color = color;
         this.isComputerPlayer = isComputerPlayer;
+
+        if (color == Color.WHITE) {
+            opponentColor = Color.BLACK;
+        } else {
+            opponentColor = Color.WHITE;
+        }
     }
 
     public void setOpponent(Player opponent) {
-        //TODO: add opponent data
         this.opponentColor = opponent.getColor();
     }
 
@@ -66,34 +71,67 @@ public class Player {
 
         for (int i = 0; i < pawns.length; i++) {
             pawn = pawns[i];
-            if (pawn.getY() == baseY && board.getSquare(pawn.getX(), baseY + step_forward).occupiedBy() == Color.NONE) {
-                valid_moves[noMoves] = new Move(new Square(pawn.getX(), baseY), new Square(pawn.getX(), baseY + step_forward), false);
-                valid_moves[noMoves].getFrom().setOccupier(Color.NONE);
-                valid_moves[noMoves].getTo().setOccupier(board.getSquare(pawn.getX(), baseY).occupiedBy());
-                noMoves++;
-                if (board.getSquare(pawn.getX(), baseY + 2 * step_forward).occupiedBy() == Color.NONE) {
-                    valid_moves[noMoves] = new Move(new Square(pawn.getX(), baseY), new Square(pawn.getX(), baseY + 2 * step_forward), false);
+            if (baseY + step_forward < 8 && pawn.getY() + step_forward < 8
+                    && pawn.getY() + step_forward >= 0 && baseY + step_forward >=0) {
+                if (pawn.getY() == baseY && board.getSquare(pawn.getX(), baseY + step_forward).occupiedBy() == Color.NONE) {
+                    valid_moves[noMoves] = new Move(new Square(pawn.getX(), baseY), new Square(pawn.getX(), baseY + step_forward), false);
                     valid_moves[noMoves].getFrom().setOccupier(Color.NONE);
                     valid_moves[noMoves].getTo().setOccupier(board.getSquare(pawn.getX(), baseY).occupiedBy());
                     noMoves++;
+
+                    if (baseY + 2 * step_forward < 8 && baseY + 2 * step_forward >= 0) {
+                        if (board.getSquare(pawn.getX(), baseY + 2 * step_forward).occupiedBy() == Color.NONE) {
+                            valid_moves[noMoves] = new Move(new Square(pawn.getX(), baseY), new Square(pawn.getX(), baseY + 2 * step_forward), false);
+                            valid_moves[noMoves].getFrom().setOccupier(Color.NONE);
+                            valid_moves[noMoves].getTo().setOccupier(board.getSquare(pawn.getX(), baseY).occupiedBy());
+                            noMoves++;
+                        }
+                    }
+                } else if (board.getSquare(pawn.getX(), pawn.getY() + step_forward).occupiedBy() == Color.NONE) {
+                    valid_moves[noMoves] = new Move(new Square(pawn.getX(), pawn.getY()), new Square(pawn.getX(), pawn.getY() + step_forward), false);
+                    valid_moves[noMoves].getFrom().setOccupier(Color.NONE);
+                    valid_moves[noMoves].getTo().setOccupier(board.getSquare(pawn.getX(), pawn.getY()).occupiedBy());
+                    noMoves++;
                 }
-            } else if (board.getSquare(pawn.getX(), pawn.getY() + step_forward).occupiedBy() == Color.NONE) {
-                valid_moves[noMoves] = new Move(new Square(pawn.getX(), pawn.getY()), new Square(pawn.getX(), pawn.getY() + step_forward), false);
-                valid_moves[noMoves].getFrom().setOccupier(Color.NONE);
-                valid_moves[noMoves].getTo().setOccupier(board.getSquare(pawn.getX(), pawn.getY()).occupiedBy());
-                noMoves++;
-            } else if (board.getSquare(pawn.getX() + 1, pawn.getY() + step_forward).occupiedBy() == this.opponentColor) {
-                valid_moves[noMoves] = new Move(new Square(pawn.getX(), pawn.getY()), new Square(pawn.getX() + 1, pawn.getY() + step_forward), true);
-                valid_moves[noMoves].getFrom().setOccupier(Color.NONE);
-                valid_moves[noMoves].getTo().setOccupier(board.getSquare(pawn.getX(), pawn.getY()).occupiedBy());
-                noMoves++;
-            } else if (board.getSquare(pawn.getX() - 1, pawn.getY() + step_forward).occupiedBy() == this.opponentColor) {
-                valid_moves[noMoves] = new Move(new Square(pawn.getX(), pawn.getY()), new Square(pawn.getX() - 1, pawn.getY() + step_forward), true);
-                valid_moves[noMoves].getFrom().setOccupier(Color.NONE);
-                valid_moves[noMoves].getTo().setOccupier(board.getSquare(pawn.getX(), pawn.getY()).occupiedBy());
-                noMoves++;
             }
-            //TODO: en-passant
+
+            if (pawn.getX() < 7 && pawn.getY() + step_forward < 8
+                    && pawn.getY() + step_forward >= 0 && baseY + step_forward >=0) {
+                if (board.getSquare(pawn.getX() + 1, pawn.getY() + step_forward).occupiedBy() == opponentColor) {
+                    valid_moves[noMoves] = new Move(new Square(pawn.getX(), pawn.getY()), new Square(pawn.getX() + 1, pawn.getY() + step_forward), true);
+                    valid_moves[noMoves].getFrom().setOccupier(Color.NONE);
+                    valid_moves[noMoves].getTo().setOccupier(board.getSquare(pawn.getX(), pawn.getY()).occupiedBy());
+                    noMoves++;
+                }
+
+                if (board.getSquare(pawn.getX() + 1, pawn.getY() + step_forward).occupiedBy() == Color.NONE &&
+                        board.getSquare(pawn.getX() + 1, pawn.getY()).occupiedBy() == opponentColor &&
+                        pawn.getY() == 7 - baseY - (2 * step_forward)) {
+                    valid_moves[noMoves] = new Move(new Square(pawn.getX(), pawn.getY()), new Square(pawn.getX() + 1, pawn.getY() + step_forward), true);
+                    valid_moves[noMoves].getFrom().setOccupier(Color.NONE);
+                    valid_moves[noMoves].getTo().setOccupier(board.getSquare(pawn.getX(), pawn.getY()).occupiedBy());
+                    noMoves++;
+                }
+            }
+
+            if (pawn.getX() > 0 && pawn.getY() + step_forward < 8
+                    && pawn.getY() + step_forward >= 0 && baseY + step_forward >=0) {
+                if (board.getSquare(pawn.getX() - 1, pawn.getY() + step_forward).occupiedBy() == opponentColor) {
+                    valid_moves[noMoves] = new Move(new Square(pawn.getX(), pawn.getY()), new Square(pawn.getX() - 1, pawn.getY() + step_forward), true);
+                    valid_moves[noMoves].getFrom().setOccupier(Color.NONE);
+                    valid_moves[noMoves].getTo().setOccupier(board.getSquare(pawn.getX(), pawn.getY()).occupiedBy());
+                    noMoves++;
+                }
+
+                if (board.getSquare(pawn.getX() - 1, pawn.getY() + step_forward).occupiedBy() == Color.NONE &&
+                        board.getSquare(pawn.getX() - 1, pawn.getY()).occupiedBy() == opponentColor &&
+                        pawn.getY() == 7 - baseY - (2 * step_forward)) {
+                    valid_moves[noMoves] = new Move(new Square(pawn.getX(), pawn.getY()), new Square(pawn.getX() - 1, pawn.getY() + step_forward), true);
+                    valid_moves[noMoves].getFrom().setOccupier(Color.NONE);
+                    valid_moves[noMoves].getTo().setOccupier(board.getSquare(pawn.getX(), pawn.getY()).occupiedBy());
+                    noMoves++;
+                }
+            }
         }
 
         Move[] returnMoves = new Move[noMoves];
@@ -108,8 +146,36 @@ public class Player {
     }
 
     public boolean isPassedPawn(Square square) {
-        //TODO: implement is passed pawn
-        return false;
+        int moveStep = 1;
+        int border = 7;
+        if (color == Color.BLACK) {
+            moveStep = -1;
+            border = 0;
+        }
+
+        for (int y = square.getY(); y <= border; y += moveStep) {
+            if (y < 8 && y >= 0) {
+                if (board.getSquare(square.getX(), y).occupiedBy() == opponentColor) {
+                    return false;
+                }
+            }
+        }
+
+        for (int y = square.getY() + 1; y <= border; y += moveStep) {
+            if (square.getX() < 7 && y >= 0 && y < 8) {
+                if (board.getSquare(square.getX() + 1, y).occupiedBy() == opponentColor) {
+                    return false;
+                }
+            }
+
+            if (square.getX() > 0 && y >= 0 && y < 8) {
+                if (board.getSquare(square.getX() - 1, y).occupiedBy() == opponentColor) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     public void makeMove() {

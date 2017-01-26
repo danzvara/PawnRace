@@ -1,8 +1,8 @@
 package javapawnrace;
 
 public class Game {
-    private Move[] moves;
-    private int move_index;
+    Move[] moves;
+    int move_index;
     private Color currentPlayer;
     private Board gameBoard;
 
@@ -98,16 +98,35 @@ public class Game {
 
     //returns zero if the pawn is blocked, one if is free 
     private int isBlocked(int y, int x, Color player) {
-        if (player == Color.WHITE) {
-            if (gameBoard.getSquare(x, y + 1).occupiedBy() == Color.NONE) {
+        Color oppositePlayer = Color.BLACK;
+        int borderLine = 4;
+        int moveStep = 1;
+        if (currentPlayer == Color.BLACK) {
+            oppositePlayer = Color.WHITE;
+            borderLine = 3;
+            moveStep = -1;
+        }
+
+        if (gameBoard.getSquare(x, y + moveStep).occupiedBy() == Color.NONE) {
+            return 1;
+        } else if (x < 7) {
+            if (gameBoard.getSquare(x + 1, y + moveStep).occupiedBy() == oppositePlayer) {
                 return 1;
             }
-            //TODO:Implement en passant move
-            //else if (x < 7 && gameBoard.getSquare(x+1, y) == BLACK && gameBoard.getSquare(x+1, y+1) == NONE) {
-            //    return 1;
-            //} else if (x > 0 && gameBoard.getSquare(x-1, y) == BLACK && gameBoard.getSquare(x-1, y+1) == NONE) {
-        } else if (player == Color.BLACK) {
-            if (gameBoard.getSquare(x, y - 1).occupiedBy() == Color.NONE) {
+
+            if (gameBoard.getSquare(x + 1, y + moveStep).occupiedBy() == Color.NONE &&
+                    gameBoard.getSquare(x + 1, y).occupiedBy() == oppositePlayer &&
+                    y == borderLine) {
+                return 1;
+            }
+        } else if (x > 0) {
+            if (gameBoard.getSquare(x - 1, y + moveStep).occupiedBy() == oppositePlayer) {
+                return 1;
+            }
+
+            if (gameBoard.getSquare(x - 1, y + moveStep).occupiedBy() == Color.NONE &&
+                    gameBoard.getSquare(x - 1, y).occupiedBy() == oppositePlayer &&
+                    y == borderLine) {
                 return 1;
             }
         }
@@ -123,50 +142,78 @@ public class Game {
     }
 
     public Move parseMove(String san) {
-        int fromX = (int) san.charAt(0) - (int) 'a';
-        int fromY = (int) san.charAt(1) - (int) '1';
-        int toX = (int) san.charAt(3) - (int) 'a';
-        int toY = (int) san.charAt(4) - (int) '1';
-        Square sqF, sqT;
-        Move move;
-        Color player = gameBoard.getSquare(fromX, fromY).occupiedBy();
-        boolean isCapture;
+
+        boolean isCapture = true;
+        boolean enPassant = false;
+        int toX = 0, toY = 0, fromX = 0, fromY = 0;
+        int firstMoveBorder = 3;
+        int moveStep = -1;
+        Color player = getPlayerColor();
+        Color oppositePlayer;
+
         if (player == Color.WHITE) {
-            if (gameBoard.getSquare(toX, toY).occupiedBy() == Color.BLACK) {
-                isCapture = true;
-            } else if (gameBoard.getSquare(toX, toY).occupiedBy() == Color.WHITE) {
-                return null;
-            } else {
-                isCapture = false;
-            }
-        } else if (player == Color.BLACK) {
-            if (gameBoard.getSquare(toX, toY).occupiedBy() == Color.WHITE) {
-                isCapture = true;
-            } else if (gameBoard.getSquare(toX, toY).occupiedBy() == Color.BLACK) {
-                return null;
-            } else {
-                isCapture = false;
-            }
+            oppositePlayer = Color.BLACK;
         } else {
-            return null;
+            oppositePlayer = Color.WHITE;
+            firstMoveBorder = 4;
+            moveStep = 1;
         }
 
+        if (san.equals("back")) {
+            unapplyMove(moves[move_index - 1]);
+            unapplyMove(moves[move_index - 1]);
+        } else if (san.length() == 2) {
+            isCapture = false;
+            toX = (int) san.charAt(0) - (int) 'a';
+            toY = (int) san.charAt(1) - (int) '1';
+            fromX = toX;
+            if (toY == firstMoveBorder &&
+                    gameBoard.getSquare(toX, toY + 2 * moveStep).occupiedBy() == player) {
+                fromY = toY + 2 * moveStep;
+            } else if (toY == firstMoveBorder &&
+                    gameBoard.getSquare(toX, toY + moveStep).occupiedBy() == player) {
+                fromY = toY + moveStep;
+            } else if (toY == firstMoveBorder + moveStep &&
+                    gameBoard.getSquare(toX, toY + moveStep).occupiedBy() == player) {
+                fromY = toY + moveStep;
+            } else if (toY > firstMoveBorder &&
+                    gameBoard.getSquare(toX, toY + moveStep).occupiedBy() == player) {
+                fromY = toY + moveStep;
+            } else {
+                System.out.print("Wrong move");
+                return null;
+            }
+        } else {
+            toX = (int) san.charAt(2) - (int) 'a';
+            toY = (int) san.charAt(3) - (int) '1';
+            fromX = (int) san.charAt(0) - (int) 'a';
+            if (gameBoard.getSquare(toX, toY).occupiedBy() == oppositePlayer
+                && gameBoard.getSquare(fromX, toY + moveStep).occupiedBy() == player) {
+                fromY = toY + moveStep;
+            } else if (gameBoard.getSquare(toX, toY).occupiedBy() == Color.NONE &&
+                        gameBoard.getSquare(toX, toY + moveStep).occupiedBy() == oppositePlayer &&
+                        gameBoard.getSquare(fromX, toY + moveStep).occupiedBy() == player &&
+                        toY + moveStep == 7 - firstMoveBorder) {
+                fromY = toY + moveStep;
+                enPassant = true;
+            } else {
+                System.out.print("Wrong move");
+                return null;
+            }
+
+        }
+
+        Square sqF, sqT;
+        Move move;
         sqF = new Square(fromX, fromY);
         sqF.setOccupier(Color.NONE);
         sqT = new Square(toX, toY);
         sqT.setOccupier(player);
         move = new Move(sqF, sqT, isCapture);
+        if (enPassant) {
+            gameBoard.getSquare(toX, toY + moveStep).setOccupier(Color.NONE);
+        }
+
         return move;
     }
 }
-
-
-
-
-
-
-
-
-
-
-

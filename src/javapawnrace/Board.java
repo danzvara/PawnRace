@@ -28,13 +28,26 @@ public class Board {
     public void applyMove(Move move) {
         Square from = move.getFrom();
         Square to = move.getTo();
-        board[to.getY()][to.getX()].setOccupier(to.occupiedBy());
-        board[from.getY()][from.getX()].setOccupier(Color.NONE);
+        if (!move.isCaptured()) {
+            board[to.getY()][to.getX()].setOccupier(to.occupiedBy());
+            board[from.getY()][from.getX()].setOccupier(Color.NONE);
+        } else {
+            //Testing for en passant move
+            if (board[to.getY()][to.getX()].occupiedBy() == Color.NONE) {
+                board[to.getY()][to.getX()].setOccupier(to.occupiedBy());
+                board[from.getY()][from.getX()].setOccupier(Color.NONE);
+                board[from.getY()][to.getX()].setOccupier(Color.NONE);
+            } else {
+                board[to.getY()][to.getX()].setOccupier(to.occupiedBy());
+                board[from.getY()][from.getX()].setOccupier(Color.NONE);
+            }
+        }
     }
 
     public void unApplyMove(Move move) {
         Square from = move.getFrom();
         Square to = move.getTo();
+        board[from.getY()][from.getX()].setOccupier(to.occupiedBy());
         if (move.isCaptured()) {
             switch (to.occupiedBy()) {
                 case BLACK:
@@ -43,12 +56,22 @@ public class Board {
                 case WHITE:
                     board[to.getY()][to.getX()].setOccupier(Color.BLACK);
                     break;
+                //En passant
+                case NONE:
+                    board[to.getY()][to.getX()].setOccupier(Color.NONE);
+                    switch (from.occupiedBy()) {
+                        case BLACK:
+                            board[from.getY()][to.getX()].setOccupier(Color.WHITE);
+                            break;
+                        case WHITE:
+                            board[from.getY()][to.getX()].setOccupier(Color.BLACK);
+                            break;
+                    }
+                    break;
             }
         } else {
             board[to.getY()][to.getX()].setOccupier(Color.NONE);
         }
-
-        board[from.getY()][from.getX()].setOccupier(from.occupiedBy());
     }
 
     public void display() {
